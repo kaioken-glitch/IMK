@@ -3,7 +3,9 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const app = express();
-const PORT = 3000;
+
+// Use process.env.PORT for Glitch/Render/Heroku compatibility
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -12,6 +14,10 @@ const DB_FILE = './db.json';
 
 // Helper to read/write db.json
 function readDB() {
+    if (!fs.existsSync(DB_FILE)) {
+        // Initialize db.json if missing
+        fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], posts: [] }, null, 2));
+    }
     return JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
 }
 function writeDB(data) {
@@ -25,7 +31,7 @@ app.get('/users', (req, res) => {
 });
 app.get('/users/:id', (req, res) => {
     const db = readDB();
-    const user = (db.users || []).find(u => u.id == req.params.id);
+    const user = (db.users || []).find(u => String(u.id) === String(req.params.id));
     if (user) res.json(user);
     else res.status(404).json({ error: 'User not found' });
 });
@@ -41,10 +47,10 @@ app.post('/users', (req, res) => {
 app.patch('/users/:id', (req, res) => {
     const db = readDB();
     let users = db.users || [];
-    users = users.map(u => u.id == req.params.id ? { ...u, ...req.body } : u);
+    users = users.map(u => String(u.id) === String(req.params.id) ? { ...u, ...req.body } : u);
     db.users = users;
     writeDB(db);
-    res.json(users.find(u => u.id == req.params.id));
+    res.json(users.find(u => String(u.id) === String(req.params.id)));
 });
 
 // --- POSTS ---
@@ -54,7 +60,7 @@ app.get('/posts', (req, res) => {
 });
 app.get('/posts/:id', (req, res) => {
     const db = readDB();
-    const post = (db.posts || []).find(p => p.id == req.params.id);
+    const post = (db.posts || []).find(p => String(p.id) === String(req.params.id));
     if (post) res.json(post);
     else res.status(404).json({ error: 'Post not found' });
 });
@@ -70,18 +76,25 @@ app.post('/posts', (req, res) => {
 app.patch('/posts/:id', (req, res) => {
     const db = readDB();
     let posts = db.posts || [];
-    posts = posts.map(p => p.id == req.params.id ? { ...p, ...req.body } : p);
+    posts = posts.map(p => String(p.id) === String(req.params.id) ? { ...p, ...req.body } : p);
     db.posts = posts;
     writeDB(db);
-    res.json(posts.find(p => p.id == req.params.id));
+    res.json(posts.find(p => String(p.id) === String(req.params.id)));
 });
 app.delete('/posts/:id', (req, res) => {
     const db = readDB();
     let posts = db.posts || [];
-    posts = posts.filter(p => p.id != req.params.id);
+    posts = posts.filter(p => String(p.id) !== String(req.params.id));
     db.posts = posts;
     writeDB(db);
     res.json({ success: true });
+});
+
+// For Glitch/Render: serve static files if needed
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+    res.send('Informed Mkenya API is running.');
 });
 
 app.listen(PORT, () => {
