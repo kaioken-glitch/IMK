@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMK</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <script src="./script/app.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <link rel="shortcut icon" href="./assets/favIcon.svg" type="image/x-icon">
+</head>
+<body>
+    <div class="main">
+        <div class="logoMain">
+            <div class="logoO">
+                <img src="./assets/logo.svg" alt="IMK-logo">
+            </div>
+            <ul id="mainNav">
+                <li>Home</li>
+                <li>World</li>
+                <li>Buisness</li>
+                <li>Technology</li>
+                <li>Innovation</li>
+                <li>Culture</li>
+                <li>Arts</li>
+                <li>Travel</li>
+            </ul>
+            <div class="userPf">
+                <div class="userPfp">
+                    <img src="" alt="">
+                </div>
+                <div class="userAlias">
+                    <p id="userAlias"></p>
+                </div>
+            </div>
+
+            <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <!-- Overlay menu (hidden by default) -->
+            <div class="mobileNavOverlay" id="mobileNavOverlay">
+                <div class="mobileNavContent">
+                    <button class="closeMenu" id="closeMenuBtn" aria-label="Close menu">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <ul id="mobileMainNav">
+                        <li>Home</li>
+                        <li>World</li>
+                        <li>Buisness</li>
+                        <li>Technology</li>
+                        <li>Innovation</li>
+                        <li>Culture</li>
+                        <li>Arts</li>
+                        <li>Travel</li>
+                    </ul>
+                    <!-- Optionally add user profile info here -->
+                    <div class="userAlias">
+                        <p id="userAlias"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="contentBody">
+            <div class="contentManifest">
+                <div class="searchBody">
+                    <input type="text" name="searchArticle" id="searchArticle" placeholder="What you looking for?">
+                    <button><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+                <div class="searchResults" id="searchResults"></div>
+                <div class="createPost">
+                    <button id="createArticle">
+                        <i class="fa-solid fa-plus"></i>
+                        <p>Add Post</p>
+                    </button>
+                </div>
+            </div>
+
+            <div class="articlePost">
+
+                <!--<div class="createdPost">
+                    <div class="postHeader">
+                        <h1>News Article Heading</h1>
+                        <h3>Article Author Name</h3>
+                        <p><i class="fa-regular fa-clock"></i> 3 minute read</p>
+                    </div>
+                    <div class="postImage">
+                        <img src="https://ichef.bbci.co.uk/news/1024/cpsprodpb/8414/live/613d5ce0-488f-11f0-84b6-6bf0f66205f1.jpg.webp" alt="article-image">
+                    </div>
+                    <div class="postImageContext">
+                        <p id="imageContext">
+                            The Mbasana brothers have to get up at 04:30 to get to school on time
+                        </p>
+                    </div>
+                    <div class="postContet">
+                        <p id="newsData"></p>
+                    </div>
+                    <div class="postInteractions">
+                        <button id="viewLogger"><i class="fa-solid fa-eye"></i>200</button>
+                        <button id="like"><i class="fa-solid fa-thumbs-up"></i>150</button>
+                        <button id="comments"><i class="fa-solid fa-comments"></i>300</button>
+                        <button id="share"><i class="fa-solid fa-share-nodes"></i>300</button>
+                        <button id="save"><i class="fa-solid fa-bookmark"></i>1k</button>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+    </div>
+
+    <div class="accessGrant">
+        <div class="logo">
+            <img src="./assets/logo.svg" alt="IMK-logo">
+        </div>
+        <div class="holder">
+            <form class="loginForm" autocomplete="on">
+                <h2>LOGIN</h2>
+                <input type="email" name="email" id="" placeholder="Email" required autocomplete="email" >
+                <input type="password" name="password" id="" placeholder="Password" important required autocomplete="password">
+                <button id="loginInitializer">Login</button>
+                <a id="signupSwitch">Don't Have An Account? Signup</a>
+            </form>
+            <form class="signupForm">
+                <h2>SIGNUP</h2>
+                <input type="email" name="email" id="" placeholder="Email" required autocomplete="email" >
+                <input type="text" name="username" id="" placeholder="Username" required autocomplete="name" >
+                <input type="password" name="password" id="" placeholder="Password" required autocomplete="new-password" >
+                <input type="password" name="confirmPassword" id="" placeholder="confirmPassword" required autocomplete="new-password" >
+                <button id="signupInitializer">Signup</button>
+                <a id="loginSwitch">Have an account? Login</a>
+            </form>
+
+            <div class="setupAlias">
+                <input type="file" name="imageProfile" id="pfpUser" placeholder="Profile Picture">
+                <input type="text" name="alias" id="internetName" placeholder="Username">
+                <button id="pfSetup"><i class="fa-solid fa-check"></i> Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/826c469fe7.js" crossorigin="anonymous"></script>
+</body>
+</html>

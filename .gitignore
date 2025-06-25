@@ -1,0 +1,17 @@
+# Node.js dependencies
+node_modules/
+
+# Local environment variables
+.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Data files (if you don't want to track local changes)
+db.json
