@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (user) {
                 // Fetch full user data (to get alias and imageProfile)
-                fetch(`http://localhost:3000/users/${user.id}`)
+                fetch(`https://imk-production.up.railway.app/users/${user.id}`)
                     .then(res => res.json())
                     .then(fullUser => {
                         // Set alias
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = loginForm.querySelector('input[name="password"]').value;
 
         try {
-            const response = await fetch('http://localhost:3000/users');
+            const response = await fetch('https://imk-production.up.railway.app/users');
             const users = await response.json();
             const user = users.find(u => u.email === email && u.password === password);
 
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch('http://localhost:3000/users', {
+            const response = await fetch('https://imk-production.up.railway.app/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, username, password })
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Helper to finish and show login
         const finishSetup = async (patchObj) => {
-            await fetch(`http://localhost:3000/users/${userId}`, {
+            await fetch(`https://imk-production.up.railway.app/users/${userId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(patchObj)
@@ -249,7 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     authorId: userId // <-- Add this line
                 };
 
-                await fetch('http://localhost:3000/posts', {
+                await fetch('https://imk-production.up.railway.app/posts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(postData)
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     articlePostDiv.innerHTML = "";
 
         try {
-            const response = await fetch('http://localhost:3000/posts');
+            const response = await fetch('https://imk-production.up.railway.app/posts');
             const posts = await response.json();
 
             for (const post of posts) {
@@ -414,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     deleteBtn.addEventListener('click', async function(e) {
                         e.preventDefault();
                         if (confirm('Are you sure you want to delete this post?')) {
-                            await fetch(`http://localhost:3000/posts/${post.id}`, {
+                            await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
                                 method: 'DELETE'
                             });
                             renderPosts();
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const newContent = contentEl.innerHTML.trim();
                     
                         // PATCH to backend
-                        await fetch(`http://localhost:3000/posts/${post.id}`, {
+                        await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (const comment of post.comments) {
                     const commentDiv = postedCommentsDiv.querySelector(`.commentDiv[data-user-id="${comment.userId}"]`);
                     if (commentDiv) {
-                        fetch(`http://localhost:3000/users/${comment.userId}`)
+                        fetch(`https://imk-production.up.railway.app/users/${comment.userId}`)
                             .then(res => res.json())
                             .then(user => {
                                 const img = commentDiv.querySelector('.profileImage img');
@@ -507,19 +507,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (!userId) return;
 
                         // Fetch user info for display
-                        const userRes = await fetch(`http://localhost:3000/users/${userId}`);
+                        const userRes = await fetch(`https://imk-production.up.railway.app/users/${userId}`);
                         const user = await userRes.json();
 
                         // Create new comment object
                         const newComment = { userId, content };
 
                         // Fetch post, add comment, and PATCH
-                        const res = await fetch(`http://localhost:3000/posts/${post.id}`);
+                        const res = await fetch(`https://imk-production.up.railway.app/posts/${post.id}`);
                         const freshPost = await res.json();
                         freshPost.comments = freshPost.comments || [];
                         freshPost.comments.push(newComment);
 
-                        await fetch(`http://localhost:3000/posts/${post.id}`, {
+                        await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ comments: freshPost.comments })
@@ -559,12 +559,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (deleteBtn) {
                                 deleteBtn.addEventListener('click', async () => {
                                     // Remove comment from post.comments array
-                                    const res = await fetch(`http://localhost:3000/posts/${post.id}`);
+                                    const res = await fetch(`https://imk-production.up.railway.app/posts/${post.id}`);
                                     const freshPost = await res.json();
                                     freshPost.comments = (freshPost.comments || []).filter(
                                         c => !(c.userId === newComment.userId && c.content === newComment.content && c.createdAt === newComment.createdAt)
                                     );
-                                    await fetch(`http://localhost:3000/posts/${post.id}`, {
+                                    await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
                                         method: 'PATCH',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ comments: freshPost.comments })
@@ -634,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userId) return;
 
         // Fetch post
-        const res = await fetch(`http://localhost:3000/posts/${postId}`);
+        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
         const post = await res.json();
 
         // Ensure viewedBy is always an array
@@ -642,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!post.viewedBy.includes(userId)) {
             post.viewedBy.push(userId);
-            await fetch(`http://localhost:3000/posts/${postId}`, {
+            await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ viewedBy: post.viewedBy })
@@ -656,7 +656,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userId = getCurrentUserId();
         if (!userId) return;
 
-        const res = await fetch(`http://localhost:3000/posts/${postId}`);
+        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
         const post = await res.json();
 
         let likedBy = post.likedBy || [];
@@ -671,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
             liked = false;
         }
 
-        await fetch(`http://localhost:3000/posts/${postId}`, {
+        await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ likedBy })
@@ -706,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const userId = getCurrentUserId();
         if (!userId) return;
 
-        const res = await fetch(`http://localhost:3000/posts/${postId}`);
+        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
         const post = await res.json();
 
         // Ensure sharedBy is always an array
@@ -714,7 +714,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!post.sharedBy.includes(userId)) {
             post.sharedBy.push(userId);
-            await fetch(`http://localhost:3000/posts/${postId}`, {
+            await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sharedBy: post.sharedBy })
@@ -731,7 +731,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!userId) return;
 
         // Update post
-        const res = await fetch(`http://localhost:3000/posts/${postId}`);
+        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
         const post = await res.json();
 
         // Ensure savedBy is always an array
@@ -741,7 +741,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!post.savedBy.includes(userId)) {
             post.savedBy.push(userId);
             changed = true;
-            await fetch(`http://localhost:3000/posts/${postId}`, {
+            await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ savedBy: post.savedBy })
@@ -749,13 +749,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Update user
-        const userRes = await fetch(`http://localhost:3000/users/${userId}`);
+        const userRes = await fetch(`https://imk-production.up.railway.app/users/${userId}`);
         const user = await userRes.json();
         const saved = user.saved || [];
         if (!saved.includes(postId)) {
             saved.push(postId);
             changed = true;
-            await fetch(`http://localhost:3000/users/${userId}`, {
+            await fetch(`https://imk-production.up.railway.app/users/${userId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ saved })
