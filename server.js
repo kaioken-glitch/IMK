@@ -3,6 +3,7 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const axios = require('axios'); 
 const SALT_ROUNDS = 10;
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,19 @@ app.use(cors());
 app.use(bodyParser.json());
 
 const DB_FILE = './db.json';
+
+// --- reCAPTCHA verification helper ---
+async function verifyRecaptcha(token) {
+    const secret = '6LfoBm4rAAAAABjG8bAP-BnHWL3FQTFCsy8xTPx5'; // <-- Replace with your secret key
+    try {
+        const response = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
+        );
+        return response.data.success;
+    } catch (err) {
+        return false;
+    }
+}
 
 // Helper to read/write db.json
 function readDB() {
@@ -35,14 +49,21 @@ app.get('/users/:id', (req, res) => {
     if (user) res.json(user);
     else res.status(404).json({ error: 'User not found' });
 });
-app.post('/users', (req, res) => {
+app.post('/users', async (req, res) => {
+    // Verify reCAPTCHA
+    const recaptchaValid = await verifyRecaptcha(req.body.recaptcha);
+    if (!recaptchaValid) {
+        return res.status(400).json({ error: 'reCAPTCHA failed' });
+    }
     const db = readDB();
     const users = db.users || [];
-    const newUser = { ...req.body, id: Date.now() };
+    // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(req.body.password, SALT_ROUNDS);
+    const newUser = { ...req.body, password: hashedPassword, id: Date.now() };
     users.push(newUser);
     db.users = users;
     writeDB(db);
-    res.json(newUser);
+    res.json({ ...newUser, password: undefined });
 });
 app.patch('/users/:id', (req, res) => {
     const db = readDB();
@@ -55,17 +76,22 @@ app.patch('/users/:id', (req, res) => {
 
 // --- LOGIN ---
 app.post('/login', async (req, res) => {
+    // Verify reCAPTCHA
+    const recaptchaValid = await verifyRecaptcha(req.body.recaptcha);
+    if (!recaptchaValid) {
+        return res.status(400).json({ error: 'reCAPTCHA failed' });
+    }
     const db = readDB();
     const users = db.users || [];
-    const user = users.find(u => u.username === req.body.username);
+    // Accept login by email or username
+    const user = users.find(u => u.email === req.body.email || u.username === req.body.email);
     if (!user) {
-        return res.status(401).json({ error: 'Invalid username or password' });
+        return res.status(401).json({ error: 'Invalid email/username or password' });
     }
     const match = await bcrypt.compare(req.body.password, user.password);
     if (!match) {
-        return res.status(401).json({ error: 'Invalid username or password' });
+        return res.status(401).json({ error: 'Invalid email/username or password' });
     }
-    // On success, return user info (never the password)
     res.json({ ...user, password: undefined });
 });
 

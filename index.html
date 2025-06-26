@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./css/index.css">
     <script src="./script/app.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <link rel="shortcut icon" href="./assets/favIcon.svg" type="image/x-icon">
 </head>
 <body>
@@ -117,6 +117,7 @@
                 <h2>LOGIN</h2>
                 <input type="email" name="email" id="" placeholder="Email" required autocomplete="email" >
                 <input type="password" name="password" id="" placeholder="Password" important required autocomplete="password">
+                <div class="g-recaptcha" data-sitekey="6LfoBm4rAAAAAC54T02WF8v7MrjYOgKT8Vk1Kbfc"></div>
                 <button id="loginInitializer">Login</button>
                 <a id="signupSwitch">Don't Have An Account? Signup</a>
             </form>
@@ -126,6 +127,7 @@
                 <input type="text" name="username" id="" placeholder="Username" required autocomplete="name" >
                 <input type="password" name="password" id="" placeholder="Password" required autocomplete="new-password" >
                 <input type="password" name="confirmPassword" id="" placeholder="confirmPassword" required autocomplete="new-password" >
+                <div class="g-recaptcha" data-sitekey="6LfoBm4rAAAAAC54T02WF8v7MrjYOgKT8Vk1Kbfc"></div>
                 <button id="signupInitializer">Signup</button>
                 <a id="loginSwitch">Have an account? Login</a>
             </form>
@@ -137,7 +139,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://kit.fontawesome.com/826c469fe7.js" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainDiv = document.querySelector('.main');
     const holder = document.querySelector('.holder');
 
+
     // Get references to forms/divs
     const loginForm = holder.querySelector('.loginForm');
     const signupForm = holder.querySelector('.signupForm');
@@ -107,23 +108,30 @@ document.addEventListener('DOMContentLoaded', () => {
         cleanUrl();
         const email = loginForm.querySelector('input[name="email"]').value.trim();
         const password = loginForm.querySelector('input[name="password"]').value;
-
+        const recaptchaToken = grecaptcha.getResponse();
+        if (!recaptchaToken) {
+            alert('Please complete the reCAPTCHA!');
+            return;
+        }
+    
         try {
-            const response = await fetch('https://imk-production.up.railway.app/users');
-            const users = await response.json();
-            const user = users.find(u => u.email === email && u.password === password);
-
-            if (user) {
-                localStorage.setItem('user', JSON.stringify({
-                    id: user.id,
-                    email: user.email,
-                    username: user.username,
-                    loginTime: Date.now()
-                }));
-                updateUI(); // This will hide accessGrant and show mainDiv
-            } else {
+            const response = await fetch('https://imk-production.up.railway.app/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password, recaptcha: recaptchaToken })
+            });
+            if (!response.ok) {
                 alert('Invalid email or password!');
+                return;
             }
+            const user = await response.json();
+            localStorage.setItem('user', JSON.stringify({
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                loginTime: Date.now()
+            }));
+            updateUI(); // This will hide accessGrant and show mainDiv
         } catch (error) {
             alert('Error connecting to server!');
         }
@@ -139,6 +147,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = signupForm.querySelector('input[name="username"]').value.trim();
         const password = signupForm.querySelector('input[name="password"]').value;
         const confirmPassword = signupForm.querySelector('input[name="confirmPassword"]').value;
+        const recaptchaToken = grecaptcha.getResponse();
+        if (!recaptchaToken) {
+            alert('Please complete the reCAPTCHA!');
+            return;
+        }
 
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
@@ -149,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://imk-production.up.railway.app/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, username, password })
+                body: JSON.stringify({ email, username, password, recaptcha: recaptchaToken })
             });
             const newUser = await response.json();
 
