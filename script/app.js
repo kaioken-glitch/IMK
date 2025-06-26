@@ -90,48 +90,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Logout functionality
-    const profileControl = document.querySelector('.userPf');
-    const logoutBtn = document.createElement('button');
-    logoutBtn.innerHTML = `<i class="fa-solid fa-door-open"></i>`;
-    logoutBtn.id = 'logoutBtn';
-    profileControl.appendChild(logoutBtn);
+        // Logout functionality
+        const profileControl = document.querySelector('.userPf');
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = `<i class="fa-solid fa-door-open"></i>`;
+        logoutBtn.id = 'logoutBtn';
+        profileControl.appendChild(logoutBtn);
 
-    logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('user');
-        updateUI();
-    });
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('user');
+            updateUI();
+        });
 
-    // LOGIN
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        cleanUrl();
-        const email = loginForm.querySelector('input[name="email"]').value.trim();
-        const password = loginForm.querySelector('input[name="password"]').value;
-        const recaptchaToken = grecaptcha.getResponse();
-        if (!recaptchaToken) {
-            alert('Please complete the reCAPTCHA!');
-            return;
-        }
-    
-        try {
-            const response = await fetch('https://imk-production.up.railway.app/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password, recaptcha: recaptchaToken })
-            });
-            if (!response.ok) {
+    loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            cleanUrl();
+            const email = loginForm.querySelector('input[name="email"]').value.trim();
+            const password = loginForm.querySelector('input[name="password"]').value;
+            try {
+                const response = await fetch('https://imk-production.up.railway.app/users');
+                const users = await response.json();
+                const user = users.find(u => u.email === email && u.password === password); 
+            if (user) {
+                localStorage.setItem('user', JSON.stringify({
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    loginTime: Date.now()
+                }));
+                updateUI(); // This will hide accessGrant and show mainDiv
+            } else {
                 alert('Invalid email or password!');
-                return;
             }
-            const user = await response.json();
-            localStorage.setItem('user', JSON.stringify({
-                id: user.id,
-                email: user.email,
-                username: user.username,
-                loginTime: Date.now()
-            }));
-            updateUI(); // This will hide accessGrant and show mainDiv
         } catch (error) {
             alert('Error connecting to server!');
         }
@@ -147,11 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const username = signupForm.querySelector('input[name="username"]').value.trim();
         const password = signupForm.querySelector('input[name="password"]').value;
         const confirmPassword = signupForm.querySelector('input[name="confirmPassword"]').value;
-        const recaptchaToken = grecaptcha.getResponse();
-        if (!recaptchaToken) {
-            alert('Please complete the reCAPTCHA!');
-            return;
-        }
 
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
@@ -162,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://imk-production.up.railway.app/users', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, username, password, recaptcha: recaptchaToken })
+                body: JSON.stringify({ email, username, password })
             });
             const newUser = await response.json();
 
