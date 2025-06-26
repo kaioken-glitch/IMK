@@ -12,6 +12,8 @@ require('dotenv').config();
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '1mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '1mb' }));
 
 const DB_FILE = './db.json';
 
