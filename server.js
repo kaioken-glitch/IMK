@@ -2,9 +2,9 @@ const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
+const SALT_ROUNDS = 10;
 const app = express();
-
-// Use process.env.PORT for Glitch/Render/Heroku compatibility
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -53,6 +53,22 @@ app.patch('/users/:id', (req, res) => {
     res.json(users.find(u => String(u.id) === String(req.params.id)));
 });
 
+// --- LOGIN ---
+app.post('/login', async (req, res) => {
+    const db = readDB();
+    const users = db.users || [];
+    const user = users.find(u => u.username === req.body.username);
+    if (!user) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    const match = await bcrypt.compare(req.body.password, user.password);
+    if (!match) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+    }
+    // On success, return user info (never the password)
+    res.json({ ...user, password: undefined });
+});
+
 // --- POSTS ---
 app.get('/posts', (req, res) => {
     const db = readDB();
@@ -94,7 +110,7 @@ app.delete('/posts/:id', (req, res) => {
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
-    res.send('Informed Mkenya API is running.');
+    res.send('IMK API is running.');
 });
 
 app.listen(PORT, () => {
