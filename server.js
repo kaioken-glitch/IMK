@@ -3,10 +3,11 @@ const fs = require('fs');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
-//const axios = require('axios'); 
+const axios = require('axios'); 
 const SALT_ROUNDS = 10;
 const app = express();
 const PORT = process.env.PORT || 3000;
+server.use(cors()); 
 require('dotenv').config();
 
 app.use(cors());
@@ -15,17 +16,17 @@ app.use(bodyParser.json());
 const DB_FILE = './db.json';
 
 // --- reCAPTCHA verification helper ---
-//async function verifyRecaptcha(token) {
-//    const secret = process.env.RECAPTCHA_SECRET;
-//    try {
-//        const response = await axios.post(
-//            `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
-//        );
-//        return response.data.success;
-//    } catch (err) {
-//        return false;
-//    }
-//}
+async function verifyRecaptcha(token) {
+    const secret = process.env.RECAPTCHA_SECRET;
+    try {
+        const response = await axios.post(
+            `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
+        );
+        return response.data.success;
+    } catch (err) {
+        return false;
+    }
+}
 
 // Helper to read/write db.json
 function readDB() {
@@ -52,10 +53,10 @@ app.get('/users/:id', (req, res) => {
 });
 app.post('/users', async (req, res) => {
     // Verify reCAPTCHA
-    //const recaptchaValid = await verifyRecaptcha(req.body.recaptcha);
-    //if (!recaptchaValid) {
-    //    return res.status(400).json({ error: 'reCAPTCHA failed' });
-    //}
+    const recaptchaValid = await verifyRecaptcha(req.body.recaptcha);
+    if (!recaptchaValid) {
+        return res.status(400).json({ error: 'reCAPTCHA failed' });
+    }
     const db = readDB();
     const users = db.users || [];
     // Hash the password before saving
@@ -78,10 +79,10 @@ app.patch('/users/:id', (req, res) => {
 // --- LOGIN ---
 app.post('/login', async (req, res) => {
     // Verify reCAPTCHA
-    //const recaptchaValid = await verifyRecaptcha(req.body.recaptcha);
-    //if (!recaptchaValid) {
-    //    return res.status(400).json({ error: 'reCAPTCHA failed' });
-    //}
+    const recaptchaValid = await verifyRecaptcha(req.body.recaptcha);
+    if (!recaptchaValid) {
+        return res.status(400).json({ error: 'reCAPTCHA failed' });
+    }
     const db = readDB();
     const users = db.users || [];
     // Accept login by email or username
