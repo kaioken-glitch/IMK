@@ -7,6 +7,7 @@ const axios = require('axios');
 const SALT_ROUNDS = 10;
 const app = express();
 const PORT = process.env.PORT || 3000;
+require('dotenv').config();
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -15,7 +16,7 @@ const DB_FILE = './db.json';
 
 // --- reCAPTCHA verification helper ---
 async function verifyRecaptcha(token) {
-    const secret = '6LfoBm4rAAAAABjG8bAP-BnHWL3FQTFCsy8xTPx5'; // <-- Replace with your secret key
+    const secret = process.env.RECAPTCHA_SECRET;
     try {
         const response = await axios.post(
             `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
