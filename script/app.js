@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = JSON.parse(localStorage.getItem('user'));
             if (user) {
                 // Fetch full user data (to get alias and imageProfile)
-                fetch(`https://imk-production.up.railway.app/users/${user.id}`)
+                fetch(`https://imk-production.onrender.com/users/${user.id}`)
                     .then(res => res.json())
                     .then(fullUser => {
                         // Set alias
@@ -103,70 +103,70 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     // LOGIN
-loginForm.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    cleanUrl();
-    const email = loginForm.querySelector('input[name="email"]').value.trim();
-    const password = loginForm.querySelector('input[name="password"]').value;
-
-    try {
-        const response = await fetch('https://imk-production.up.railway.app/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
-        });
-
-        if (!response.ok) {
-            alert('Invalid email or password!');
+    loginForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        cleanUrl();
+        const email = loginForm.querySelector('input[name="email"]').value.trim();
+        const password = loginForm.querySelector('input[name="password"]').value;
+    
+        try {
+            const response = await fetch('https://imk-production.onrender.com/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+        
+            if (!response.ok) {
+                alert('Invalid email or password!');
+                return;
+            }
+        
+            const user = await response.json();
+            localStorage.setItem('user', JSON.stringify({
+                id: user.id,
+                email: user.email,
+                username: user.username,
+                loginTime: Date.now()
+            }));
+        
+            updateUI(); // Hide accessGrant and show mainDiv
+        } catch (error) {
+            alert('Error connecting to server!');
+        }
+    });
+    
+    updateUI();
+    
+    // SIGNUP
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        cleanUrl();
+        const email = signupForm.querySelector('input[name="email"]').value.trim();
+        const username = signupForm.querySelector('input[name="username"]').value.trim();
+        const password = signupForm.querySelector('input[name="password"]').value;
+        const confirmPassword = signupForm.querySelector('input[name="confirmPassword"]').value;
+    
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
             return;
         }
-
-        const user = await response.json();
-        localStorage.setItem('user', JSON.stringify({
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            loginTime: Date.now()
-        }));
-
-        updateUI(); // Hide accessGrant and show mainDiv
-    } catch (error) {
-        alert('Error connecting to server!');
-    }
-});
-
-updateUI();
-
-// SIGNUP
-signupForm.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    cleanUrl();
-    const email = signupForm.querySelector('input[name="email"]').value.trim();
-    const username = signupForm.querySelector('input[name="username"]').value.trim();
-    const password = signupForm.querySelector('input[name="password"]').value;
-    const confirmPassword = signupForm.querySelector('input[name="confirmPassword"]').value;
-
-    if (password !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
-    }
-
-    try {
-        const response = await fetch('https://imk-production.up.railway.app/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, username, password })
-        });
-
-        const newUser = await response.json();
-
-        // Store newUser ID for alias setup
-        setupAliasDiv.dataset.userid = newUser.id;
-        showSetupAlias();
-    } catch (error) {
-        alert('Signup failed!');
-    }
-});
+    
+        try {
+            const response = await fetch('https://imk-production.onrender.com/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, username, password })
+            });
+        
+            const newUser = await response.json();
+        
+            // Store newUser ID for alias setup
+            setupAliasDiv.dataset.userid = newUser.id;
+            showSetupAlias();
+        } catch (error) {
+            alert('Signup failed!');
+        }
+    });
 
 
     // SETUP ALIAS
@@ -185,7 +185,7 @@ signupForm.addEventListener('submit', async function(e) {
 
         // Helper to finish and show login
         const finishSetup = async (patchObj) => {
-            await fetch(`https://imk-production.up.railway.app/users/${userId}`, {
+            await fetch(`https://imk-production.onrender.com/users/${userId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(patchObj)
@@ -257,7 +257,7 @@ signupForm.addEventListener('submit', async function(e) {
                     authorId: userId // <-- Add this line
                 };
 
-                await fetch('https://imk-production.up.railway.app/posts', {
+                await fetch('https://imk-production.onrender.com/posts', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(postData)
@@ -273,7 +273,7 @@ signupForm.addEventListener('submit', async function(e) {
     articlePostDiv.innerHTML = "";
 
         try {
-            const response = await fetch('https://imk-production.up.railway.app/posts');
+            const response = await fetch('https://imk-production.onrender.com/posts');
             const posts = await response.json();
 
             for (const post of posts) {
@@ -422,7 +422,7 @@ signupForm.addEventListener('submit', async function(e) {
                     deleteBtn.addEventListener('click', async function(e) {
                         e.preventDefault();
                         if (confirm('Are you sure you want to delete this post?')) {
-                            await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
+                            await fetch(`https://imk-production.onrender.com/posts/${post.id}`, {
                                 method: 'DELETE'
                             });
                             renderPosts();
@@ -436,7 +436,7 @@ signupForm.addEventListener('submit', async function(e) {
                         const newContent = contentEl.innerHTML.trim();
                     
                         // PATCH to backend
-                        await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
+                        await fetch(`https://imk-production.onrender.com/posts/${post.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -484,7 +484,7 @@ signupForm.addEventListener('submit', async function(e) {
                 for (const comment of post.comments) {
                     const commentDiv = postedCommentsDiv.querySelector(`.commentDiv[data-user-id="${comment.userId}"]`);
                     if (commentDiv) {
-                        fetch(`https://imk-production.up.railway.app/users/${comment.userId}`)
+                        fetch(`https://imk-production.onrender.com/users/${comment.userId}`)
                             .then(res => res.json())
                             .then(user => {
                                 const img = commentDiv.querySelector('.profileImage img');
@@ -515,19 +515,19 @@ signupForm.addEventListener('submit', async function(e) {
                         if (!userId) return;
 
                         // Fetch user info for display
-                        const userRes = await fetch(`https://imk-production.up.railway.app/users/${userId}`);
+                        const userRes = await fetch(`https://imk-production.onrender.com/users/${userId}`);
                         const user = await userRes.json();
 
                         // Create new comment object
                         const newComment = { userId, content };
 
                         // Fetch post, add comment, and PATCH
-                        const res = await fetch(`https://imk-production.up.railway.app/posts/${post.id}`);
+                        const res = await fetch(`https://imk-production.onrender.com/posts/${post.id}`);
                         const freshPost = await res.json();
                         freshPost.comments = freshPost.comments || [];
                         freshPost.comments.push(newComment);
 
-                        await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
+                        await fetch(`https://imk-production.onrender.com/posts/${post.id}`, {
                             method: 'PATCH',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ comments: freshPost.comments })
@@ -567,12 +567,12 @@ signupForm.addEventListener('submit', async function(e) {
                             if (deleteBtn) {
                                 deleteBtn.addEventListener('click', async () => {
                                     // Remove comment from post.comments array
-                                    const res = await fetch(`https://imk-production.up.railway.app/posts/${post.id}`);
+                                    const res = await fetch(`https://imk-production.onrender.com/posts/${post.id}`);
                                     const freshPost = await res.json();
                                     freshPost.comments = (freshPost.comments || []).filter(
                                         c => !(c.userId === newComment.userId && c.content === newComment.content && c.createdAt === newComment.createdAt)
                                     );
-                                    await fetch(`https://imk-production.up.railway.app/posts/${post.id}`, {
+                                    await fetch(`https://imk-production.onrender.com/posts/${post.id}`, {
                                         method: 'PATCH',
                                         headers: { 'Content-Type': 'application/json' },
                                         body: JSON.stringify({ comments: freshPost.comments })
@@ -642,7 +642,7 @@ signupForm.addEventListener('submit', async function(e) {
         if (!userId) return;
 
         // Fetch post
-        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
+        const res = await fetch(`https://imk-production.onrender.com/posts/${postId}`);
         const post = await res.json();
 
         // Ensure viewedBy is always an array
@@ -650,7 +650,7 @@ signupForm.addEventListener('submit', async function(e) {
 
         if (!post.viewedBy.includes(userId)) {
             post.viewedBy.push(userId);
-            await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
+            await fetch(`https://imk-production.onrender.com/posts/${postId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ viewedBy: post.viewedBy })
@@ -664,7 +664,7 @@ signupForm.addEventListener('submit', async function(e) {
         const userId = getCurrentUserId();
         if (!userId) return;
 
-        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
+        const res = await fetch(`https://imk-production.onrender.com/posts/${postId}`);
         const post = await res.json();
 
         let likedBy = post.likedBy || [];
@@ -679,7 +679,7 @@ signupForm.addEventListener('submit', async function(e) {
             liked = false;
         }
 
-        await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
+        await fetch(`https://imk-production.onrender.com/posts/${postId}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ likedBy })
@@ -714,7 +714,7 @@ signupForm.addEventListener('submit', async function(e) {
         const userId = getCurrentUserId();
         if (!userId) return;
 
-        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
+        const res = await fetch(`https://imk-production.onrender.com/posts/${postId}`);
         const post = await res.json();
 
         // Ensure sharedBy is always an array
@@ -722,7 +722,7 @@ signupForm.addEventListener('submit', async function(e) {
 
         if (!post.sharedBy.includes(userId)) {
             post.sharedBy.push(userId);
-            await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
+            await fetch(`https://imk-production.onrender.com/posts/${postId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sharedBy: post.sharedBy })
@@ -739,7 +739,7 @@ signupForm.addEventListener('submit', async function(e) {
         if (!userId) return;
 
         // Update post
-        const res = await fetch(`https://imk-production.up.railway.app/posts/${postId}`);
+        const res = await fetch(`https://imk-production.onrender.com/posts/${postId}`);
         const post = await res.json();
 
         // Ensure savedBy is always an array
@@ -749,7 +749,7 @@ signupForm.addEventListener('submit', async function(e) {
         if (!post.savedBy.includes(userId)) {
             post.savedBy.push(userId);
             changed = true;
-            await fetch(`https://imk-production.up.railway.app/posts/${postId}`, {
+            await fetch(`https://imk-production.onrender.com/posts/${postId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ savedBy: post.savedBy })
@@ -757,13 +757,13 @@ signupForm.addEventListener('submit', async function(e) {
         }
 
         // Update user
-        const userRes = await fetch(`https://imk-production.up.railway.app/users/${userId}`);
+        const userRes = await fetch(`https://imk-production.onrender.com/users/${userId}`);
         const user = await userRes.json();
         const saved = user.saved || [];
         if (!saved.includes(postId)) {
             saved.push(postId);
             changed = true;
-            await fetch(`https://imk-production.up.railway.app/users/${userId}`, {
+            await fetch(`https://imk-production.onrender.com/users/${userId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ saved })
